@@ -44,7 +44,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -330,10 +329,7 @@ public class DeploymentTestCase {
                     // Create the .dodeploy file
                     final File dodeploy = new File(deployDir, "test-deployment.jar.dodeploy");
                     final File isdeploying = new File(deployDir, "test-deployment.jar.isdeploying");
-                    try (final OutputStream out = new BufferedOutputStream(new FileOutputStream(dodeploy))){
-                        out.write("test-deployment.jar".getBytes());
-                    }
-                    Assert.assertTrue(dodeploy.exists());
+                    Assert.assertTrue(dodeploy.createNewFile());
                     for (int i = 0; i < TIMEOUT / BACKOFF; i++) {
                         if (!dodeploy.exists() && !isdeploying.exists() && deployed.exists()) {
                             break;
@@ -352,13 +348,11 @@ public class DeploymentTestCase {
                 @Override
                 public void fullReplace() throws IOException {
                     // Copy same deployment with changed property to deploy directory
-                    final JavaArchive archive2 = ServiceActivatorDeploymentUtil.createServiceActivatorDeploymentArchive("test-deployment.jar", properties2);
                     File target = new File(deployDir, "test-deployment.jar");
                     final File dodeploy = new File(deployDir, "test-deployment.jar.dodeploy");
                     final File isdeploying = new File(deployDir, "test-deployment.jar.isdeploying");
                     archive2.as(ZipExporter.class).exportTo(target, true);
-                    dodeploy.createNewFile();
-                    Assert.assertTrue(dodeploy.exists());
+                    Assert.assertTrue(dodeploy.createNewFile());
                     for (int i = 0; i < TIMEOUT / BACKOFF; i++) {
                         if (!dodeploy.exists() && !isdeploying.exists() && deployed.exists()) {
                             break;
@@ -435,6 +429,7 @@ public class DeploymentTestCase {
     @Test
     public void testFilesystemDeployment_Auto() throws Exception {
         final JavaArchive archive = ServiceActivatorDeploymentUtil.createServiceActivatorDeploymentArchive("test-deployment.jar", properties);
+        final JavaArchive archive2 = ServiceActivatorDeploymentUtil.createServiceActivatorDeploymentArchive("test-deployment.jar", properties2);
         final File dir = new File("target/archives");
         dir.mkdirs();
         final File file = new File(dir, "test-deployment.jar");
@@ -489,7 +484,6 @@ public class DeploymentTestCase {
                 @Override
                 public void fullReplace() throws IOException {
                     // Copy same deployment with changed property to deploy directory
-                    final JavaArchive archive2 = ServiceActivatorDeploymentUtil.createServiceActivatorDeploymentArchive("test-deployment.jar", properties2);
                     File target = new File(deployDir, "test-deployment.jar");
                     archive2.as(ZipExporter.class).exportTo(target, true);
                     final File isdeploying = new File(deployDir, "test-deployment.jar.isdeploying");
@@ -642,8 +636,7 @@ public class DeploymentTestCase {
                     // Create the .dodeploy file
                     final File dodeploy = new File(deployDir, "test-deployment.jar.dodeploy");
                     final File isdeploying = new File(deployDir, "test-deployment.jar.isdeploying");
-                    Files.write(dodeploy.toPath(), "test-deployment.jar".getBytes(StandardCharsets.UTF_8));
-                    Assert.assertTrue(dodeploy.exists());
+                    Assert.assertTrue(dodeploy.createNewFile());
                     for (int i = 0; i < TIMEOUT / BACKOFF; i++) {
                         if (!dodeploy.exists() && !isdeploying.exists() && deployed.exists()) {
                             break;
@@ -671,8 +664,7 @@ public class DeploymentTestCase {
                         replacementProps.putAll(properties2);
                         replacementProps.store(os, null);
                     }
-                    dodeploy.createNewFile();
-                    Assert.assertTrue(dodeploy.exists());
+                    Assert.assertTrue(dodeploy.createNewFile());
                     for (int i = 0; i < TIMEOUT / BACKOFF; i++) {
                         if (!dodeploy.exists() && !isdeploying.exists() && deployed.exists()) {
                             break;
@@ -706,10 +698,8 @@ public class DeploymentTestCase {
                     } catch (InterruptedException e) {
                         Thread.currentThread().interrupt();
                         throw new RuntimeException(e);
-                    } catch (ExecutionException e) {
+                    } catch (ExecutionException|TimeoutException e) {
                         throw new RuntimeException(e.getCause());
-                    } catch (TimeoutException e) {
-                        throw new RuntimeException(e);
                     } finally {
                         if (!future.isDone()) {
                             future.cancel(true);
@@ -733,10 +723,8 @@ public class DeploymentTestCase {
                     } catch (InterruptedException e) {
                         Thread.currentThread().interrupt();
                         throw new RuntimeException(e);
-                    } catch (ExecutionException e) {
+                    } catch (ExecutionException|TimeoutException e) {
                         throw new RuntimeException(e.getCause());
-                    } catch (TimeoutException e) {
-                        throw new RuntimeException(e);
                     } finally {
                         if (!future.isDone()) {
                             future.cancel(true);
@@ -920,10 +908,8 @@ public class DeploymentTestCase {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new RuntimeException(e);
-        } catch (ExecutionException e) {
+        } catch (ExecutionException|TimeoutException e) {
             throw new RuntimeException(e.getCause());
-        } catch (TimeoutException e) {
-            throw new RuntimeException(e);
         } finally {
             if (!future.isDone()) {
                 future.cancel(true);
@@ -938,34 +924,6 @@ public class DeploymentTestCase {
             }
         }
         toClean.delete();
-    }
-
-    private void waitUntilFileExists(File expected) {
-        for (int i = 0; i < TIMEOUT / BACKOFF; i++) {
-            if (expected.exists()) {
-                break;
-            }
-            try {
-                Thread.sleep(BACKOFF);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                throw new RuntimeException(e);
-            }
-        }
-    }
-
-    private void waitUntilFileDeleted(File unwanted) {
-        for (int i = 0; i < TIMEOUT / BACKOFF; i++) {
-            if (!unwanted.exists()) {
-                break;
-            }
-            try {
-                Thread.sleep(BACKOFF);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                throw new RuntimeException(e);
-            }
-        }
     }
 
     private void readContentManaged(String path, String expectedValue, ModelControllerClient client) throws IOException {
@@ -1000,10 +958,8 @@ public class DeploymentTestCase {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new RuntimeException(e);
-        } catch (ExecutionException e) {
+        } catch (ExecutionException|TimeoutException e) {
             throw new RuntimeException(e.getCause());
-        } catch (TimeoutException e) {
-            throw new RuntimeException(e);
         } finally {
             if (!future.isDone()) {
                 future.cancel(true);
@@ -1059,10 +1015,12 @@ public class DeploymentTestCase {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new RuntimeException(e);
-        } catch (ExecutionException e) {
+        } catch (ExecutionException|TimeoutException e) {
             throw new RuntimeException(e.getCause());
-        } catch (TimeoutException e) {
-            throw new RuntimeException(e);
+        } finally {
+            if (!future.isDone()) {
+                future.cancel(true);
+            }
         }
     }
 

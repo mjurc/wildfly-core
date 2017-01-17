@@ -208,10 +208,8 @@ public class ExplodedDeploymentTestCase {
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                     throw new RuntimeException(e);
-                } catch (ExecutionException e) {
+                } catch (ExecutionException|TimeoutException e) {
                     throw new RuntimeException(e.getCause());
-                } catch (TimeoutException e) {
-                    throw new RuntimeException(e);
                 } finally {
                     if (!future.isDone()) {
                         future.cancel(true);
@@ -239,10 +237,8 @@ public class ExplodedDeploymentTestCase {
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                     throw new RuntimeException(e);
-                } catch (ExecutionException e) {
+                } catch (ExecutionException|TimeoutException e) {
                     throw new RuntimeException(e.getCause());
-                } catch (TimeoutException e) {
-                    throw new RuntimeException(e);
                 } finally {
                     if (!future.isDone()) {
                         future.cancel(true);
@@ -299,10 +295,8 @@ public class ExplodedDeploymentTestCase {
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                     throw new RuntimeException(e);
-                } catch (ExecutionException e) {
+                } catch (ExecutionException|TimeoutException e) {
                     throw new RuntimeException(e.getCause());
-                } catch (TimeoutException e) {
-                    throw new RuntimeException(e);
                 } finally {
                     if (!future.isDone()) {
                         future.cancel(true);
@@ -410,10 +404,8 @@ public class ExplodedDeploymentTestCase {
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                     throw new RuntimeException(e);
-                } catch (ExecutionException e) {
+                } catch (ExecutionException|TimeoutException e) {
                     throw new RuntimeException(e.getCause());
-                } catch (TimeoutException e) {
-                    throw new RuntimeException(e);
                 } finally {
                     if (!future.isDone()) {
                         future.cancel(true);
@@ -443,10 +435,8 @@ public class ExplodedDeploymentTestCase {
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                     throw new RuntimeException(e);
-                } catch (ExecutionException e) {
+                } catch (ExecutionException|TimeoutException e) {
                     throw new RuntimeException(e.getCause());
-                } catch (TimeoutException e) {
-                    throw new RuntimeException(e);
                 } finally {
                     if (!future.isDone()) {
                         future.cancel(true);
@@ -500,10 +490,8 @@ public class ExplodedDeploymentTestCase {
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                     throw new RuntimeException(e);
-                } catch (ExecutionException e) {
+                } catch (ExecutionException|TimeoutException e) {
                     throw new RuntimeException(e.getCause());
-                } catch (TimeoutException e) {
-                    throw new RuntimeException(e);
                 } finally {
                     if (!future.isDone()) {
                         future.cancel(true);
@@ -605,16 +593,13 @@ public class ExplodedDeploymentTestCase {
     }
 
     private void awaitDeploymentExecution(Future<?> future) {
-        Object t = null;
         try {
-            t = future.get(TIMEOUT, TimeUnit.MILLISECONDS);
+            future.get(TIMEOUT, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new RuntimeException(e);
-        } catch (ExecutionException e) {
+        } catch (ExecutionException|TimeoutException e) {
             throw new RuntimeException(e.getCause());
-        } catch (TimeoutException e) {
-            throw new RuntimeException(e);
         } finally {
             if (!future.isDone()) {
                 future.cancel(true);

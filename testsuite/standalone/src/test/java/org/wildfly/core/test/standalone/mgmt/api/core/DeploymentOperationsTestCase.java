@@ -61,6 +61,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.ExecutionException;
@@ -277,10 +278,8 @@ public class DeploymentOperationsTestCase {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new RuntimeException(e);
-        } catch (ExecutionException e) {
+        } catch (ExecutionException|TimeoutException e) {
             throw new RuntimeException(e.getCause());
-        } catch (TimeoutException e) {
-            throw new RuntimeException(e);
         } finally {
             if (!future.isDone()) {
                 future.cancel(true);
@@ -356,10 +355,8 @@ public class DeploymentOperationsTestCase {
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 throw new RuntimeException(e);
-            } catch (ExecutionException e) {
+            } catch (ExecutionException|TimeoutException e) {
                 throw new RuntimeException(e.getCause());
-            } catch (TimeoutException e) {
-                throw new RuntimeException(e);
             } finally {
                 if (!future.isDone()) {
                     future.cancel(true);
@@ -488,21 +485,21 @@ public class DeploymentOperationsTestCase {
         assertBrowseContentReturnsExpectedResult(expected, TEST_DEPLOYMENT_NAME, "", true, -1);
         expected = new ArrayList<>(Arrays.asList("misc/", "other/", "lib/", "web.war"));
         assertBrowseContentReturnsExpectedResult(expected, TEST_DEPLOYMENT_NAME, "", false, 1);
-        expected = new ArrayList<>(Arrays.asList("web.war"));
+        expected = new ArrayList<>(Collections.singletonList("web.war"));
         assertBrowseContentReturnsExpectedResult(expected, TEST_DEPLOYMENT_NAME, "", true, 1);
-        expected = new ArrayList<>(Arrays.asList("lib.jar"));
+        expected = new ArrayList<>(Collections.singletonList("lib.jar"));
         assertBrowseContentReturnsExpectedResult(expected, TEST_DEPLOYMENT_NAME, "lib/", true, -1);
         expected = new ArrayList<>(Arrays.asList("page.html", "lib/", "lib/inner-lib.jar"));
         assertBrowseContentReturnsExpectedResult(expected, TEST_DEPLOYMENT_NAME, "web.war/", false, -1);
-        expected = new ArrayList<>(Arrays.asList("lib/inner-lib.jar"));
+        expected = new ArrayList<>(Collections.singletonList("lib/inner-lib.jar"));
         assertBrowseContentReturnsExpectedResult(expected, TEST_DEPLOYMENT_NAME, "web.war/", true, -1);
         expected = new ArrayList<>(Arrays.asList("page.html", "lib/"));
         assertBrowseContentReturnsExpectedResult(expected, TEST_DEPLOYMENT_NAME, "web.war/", false, 1);
         expected = new ArrayList<>();
         assertBrowseContentReturnsExpectedResult(expected, TEST_DEPLOYMENT_NAME, "web.war/", true, 1);
-        expected = new ArrayList<>(Arrays.asList("inner-lib.jar"));
+        expected = new ArrayList<>(Collections.singletonList("inner-lib.jar"));
         assertBrowseContentReturnsExpectedResult(expected, TEST_DEPLOYMENT_NAME, "web.war/lib/", false, -1);
-        expected = new ArrayList<>(Arrays.asList("inner-lib.jar"));
+        expected = new ArrayList<>(Collections.singletonList("inner-lib.jar"));
         assertBrowseContentReturnsExpectedResult(expected, TEST_DEPLOYMENT_NAME, "web.war/lib/", true, -1);
         expected = new ArrayList<>(Arrays.asList("META-INF/", "META-INF/MANIFEST.MF",
                 "META-INF/services/", "META-INF/services/org.jboss.msc.service.ServiceActivator",
@@ -522,11 +519,11 @@ public class DeploymentOperationsTestCase {
                 "org/jboss/as/test/deployment/trivial/", "service-activator-deployment.properties",
                 "org/jboss/as/test/deployment/trivial/ServiceActivatorDeployment.class", "inner-lib.jar"));
         assertBrowseContentReturnsExpectedResult(expected, TEST_DEPLOYMENT_NAME, "lib/lib.jar/", false, -1);
-        expected = new ArrayList<>(Arrays.asList("inner-lib.jar"));
+        expected = new ArrayList<>(Collections.singletonList("inner-lib.jar"));
         assertBrowseContentReturnsExpectedResult(expected, TEST_DEPLOYMENT_NAME, "lib/lib.jar/", true, -1);
         expected = new ArrayList<>(Arrays.asList("META-INF/", "org/", "inner-lib.jar", "service-activator-deployment.properties"));
         assertBrowseContentReturnsExpectedResult(expected, TEST_DEPLOYMENT_NAME, "lib/lib.jar/", false, 1);
-        expected = new ArrayList<>(Arrays.asList("inner-lib.jar"));
+        expected = new ArrayList<>(Collections.singletonList("inner-lib.jar"));
         assertBrowseContentReturnsExpectedResult(expected, TEST_DEPLOYMENT_NAME, "lib/lib.jar/", true, 1);
         expected = new ArrayList<>(Arrays.asList("META-INF/", "META-INF/MANIFEST.MF",
                 "META-INF/services/", "META-INF/services/org.jboss.msc.service.ServiceActivator",
@@ -672,10 +669,8 @@ public class DeploymentOperationsTestCase {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new RuntimeException(e);
-        } catch (ExecutionException e) {
+        } catch (ExecutionException|TimeoutException e) {
             throw new RuntimeException(e.getCause());
-        } catch (TimeoutException e) {
-            throw new RuntimeException(e);
         } finally {
             if (!future.isDone()) {
                 future.cancel(true);
@@ -690,10 +685,8 @@ public class DeploymentOperationsTestCase {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new RuntimeException(e);
-        } catch (ExecutionException e) {
+        } catch (ExecutionException|TimeoutException e) {
             throw new RuntimeException(e.getCause());
-        } catch (TimeoutException e) {
-            throw new RuntimeException(e);
         } finally {
             if (!future.isDone()) {
                 future.cancel(true);
@@ -707,10 +700,8 @@ public class DeploymentOperationsTestCase {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new RuntimeException(e);
-        } catch (ExecutionException e) {
+        } catch (ExecutionException|TimeoutException e) {
             throw new RuntimeException(e.getCause());
-        } catch (TimeoutException e) {
-            throw new RuntimeException(e);
         } finally {
             if (!future.isDone()) {
                 future.cancel(true);
